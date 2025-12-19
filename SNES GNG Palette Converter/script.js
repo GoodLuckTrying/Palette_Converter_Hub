@@ -452,24 +452,24 @@ class TPLPaletteConverter {
     populateExampleData() {
         const rgbExample = `000000
 526384
-ff9c00
-7b9cbd
-c6d6f7
-ffffff
-f7ef8c
-c6b54a
-7b5a00
-9c7300
-d6ad84
-ffdeb5
+7384a5
+94a5c6
+a5b5d6
+f7f7f7
+c6c694
+a5a573
+735200
+846300
+b59473
+e7c6a5
 0063b5
-ce6b00
-8c1000
-080808`;
+c66300
+840000
+101010`;
 
         // Note: The BGR data below may not convert to the exact RGB colors above
         // This is just example data - you should input your actual BGR data
-        const bgrExample = `00 00 8A 41 7F 02 6F 5E 58 7B FF 7F BE 47 D8 26 6F 01 D3 01 BA 42 7F 5B 80 59 B9 01 51 00 21 04`;
+        const bgrExample = `82 A0 8A 41 0E 52 92 62 D4 6A DE 7B 18 4B 94 3A 4E 01 90 01 56 3A 1C 53 80 59 98 01 10 00 42 08`;
 
         // Set example data if fields are empty
         if (!this.rgbPalette.value) {
