@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis Palette Converter</title>
+    <link rel="icon" type="image/png" href="../Icons/Sega_-_Mega_Drive_-_Genesis.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="text-align: left; margin-bottom: 10px;">
+                <a href="../index.html" style="color: white; text-decoration: none; font-size: 0.9rem; opacity: 0.9;">← Return to Hub</a>
+            </div>
+            <h1 style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                <img src="../Icons/Sega_-_Mega_Drive_-_Genesis.png" alt="Genesis" style="width: 48px; height: 48px; object-fit: contain;">
+                Genesis Palette Converter
+            </h1>
+            <p>Convert RGB hex palettes to Genesis CRAM format and TPL files. Made for Ghouls 'n Ghosts but may work for other Genesis games.</p>
+        </header>
+
+        <div class="upload-section">
+            <h2>📁 Upload Existing TPL File</h2>
+            <div class="upload-controls">
+                <input type="file" id="tpl-upload" accept=".tpl" />
+                <button id="upload-btn" class="convert-btn">Load TPL File</button>
+            </div>
+            <div class="upload-info">
+                <p>Upload a TPL file to automatically populate both RGB and BGR input fields with the extracted palette data.</p>
+            </div>
+        </div>
+
+        <main>
+            <div class="input-section">
+                <h2>Input Format</h2>
+                <div class="format-tabs">
+                    <button class="tab-btn active" data-format="rgb">RGB Hex (16 lines)</button>
+                    <button class="tab-btn" data-format="genesis">Genesis CRAM (9-bit RGB)</button>
+                    <button class="tab-btn" data-format="bgr32">BGR32 (3-digit)</button>
+                    <button class="tab-btn" data-format="rgb32">RGB32 (3-digit)</button>
+                </div>
+
+                <div class="input-container">
+                    <div id="rgb-input" class="input-area active">
+                        <label for="rgb-palette">Enter 16 RGB hex colors (one per line OR space-separated):</label>
+                        <textarea id="rgb-palette" placeholder="6d6d6d 000000 ffffff ffb66d b66d00 6d4900 ffff00 ffb600 ff0000 006dff 00ffff 00b6db 00ff6d 00b66d b6b6ff 6d6db6&#10;&#10;OR one per line:&#10;6d6d6d&#10;000000&#10;ffffff&#10;ffb66d&#10;b66d00&#10;6d4900&#10;ffff00&#10;ffb600&#10;ff0000&#10;006dff&#10;00ffff&#10;00b6db&#10;00ff6d&#10;00b66d&#10;b6b6ff&#10;6d6db6"></textarea>
+                        <div class="palette-preview" id="rgb-preview"></div>
+                        <div class="conversion-controls">
+                            <button id="rgb-to-genesis-btn" class="convert-btn secondary">Convert to Genesis CRAM</button>
+                            <button id="rgb-to-bgr32-btn" class="convert-btn secondary">Convert to BGR32</button>
+                            <button id="rgb-to-rgb32-btn" class="convert-btn secondary">Convert to RGB32</button>
+                        </div>
+                        <div class="info-note">
+                            ℹ️ <strong>RGB Hex Format:</strong> Standard 6-digit hexadecimal RGB colors.
+                            <br>Format: Accepts both space-separated and line-by-line input
+                            <br>Example: 6d6d6d = medium gray, ffffff = white, ff0000 = red
+                        </div>
+                    </div>
+
+                    <div id="genesis-input" class="input-area">
+                        <label for="genesis-palette">Enter Genesis CRAM data (9-bit RGB format):</label>
+                        <textarea id="genesis-palette" placeholder="06 66 00 00 0E EE 06 AE 00 6A 00 46 00 EE 00 AE 00 0E 0E 60 0E E0 0C A0 06 E0 06 A0 0E AA 0A 66"></textarea>
+                        <div class="palette-preview" id="genesis-preview"></div>
+                        <div class="conversion-controls">
+                            <button id="genesis-to-rgb-btn" class="convert-btn secondary">Convert to RGB Hex</button>
+                            <button id="genesis-to-bgr32-btn" class="convert-btn secondary">Convert to BGR32</button>
+                            <button id="genesis-to-rgb32-btn" class="convert-btn secondary">Convert to RGB32</button>
+                        </div>
+                        <div class="info-note">
+                            ℹ️ <strong>Genesis CRAM Format:</strong> Uses 9-bit RGB (3 bits per channel, 0-7) stored in 16-bit words.
+                            <br>Format: BBBGGGRRR (9-bit RGB)
+                            <br>Example: 00 AE = orange (7,5,0), 00 0E = red (7,0,0), 0E 60 = pastel blue (0,3,7)
+                        </div>
+                    </div>
+
+                    <div id="bgr32-input" class="input-area">
+                        <label for="bgr32-palette">Enter BGR32 colors (space-separated 3-digit hex):</label>
+                        <textarea id="bgr32-palette" placeholder="666 000 EEE 6AE 06A 046 0EE 0AE 00E E60 EE0 CA0 6E0 6A0 EAA A66"></textarea>
+                        <div class="palette-preview" id="bgr32-preview"></div>
+                        <div class="conversion-controls">
+                            <button id="bgr32-to-rgb-btn" class="convert-btn secondary">Convert to RGB Hex</button>
+                            <button id="bgr32-to-cram-btn" class="convert-btn secondary">Convert to Genesis CRAM</button>
+                            <button id="bgr32-to-rgb32-btn" class="convert-btn secondary">Convert to RGB32</button>
+                        </div>
+                        <div class="info-note">
+                            ℹ️ <strong>BGR32 Format:</strong> Uses 3-digit hexadecimal values in Blue-Green-Red order.
+                            <br>Format: Each digit represents 4-bit values (0-F) converted to 3-bit Genesis values (0-7)
+                            <br>Example: 000 = black, EEE = white, 6AE = light blue, 00E = red
+                        </div>
+                    </div>
+
+                    <div id="rgb32-input" class="input-area">
+                        <label for="rgb32-palette">Enter RGB32 colors (space-separated 3-digit hex):</label>
+                        <textarea id="rgb32-palette" placeholder="666 000 EEE A6E A60 640 E0E E0A E00 06E 0EE 0AC 0E6 0A6 AAE 66A"></textarea>
+                        <div class="palette-preview" id="rgb32-preview"></div>
+                        <div class="conversion-controls">
+                            <button id="rgb32-to-rgb-btn" class="convert-btn secondary">Convert to RGB Hex</button>
+                            <button id="rgb32-to-cram-btn" class="convert-btn secondary">Convert to Genesis CRAM</button>
+                            <button id="rgb32-to-bgr32-btn" class="convert-btn secondary">Convert to BGR32</button>
+                        </div>
+                        <div class="info-note">
+                            ℹ️ <strong>RGB32 Format:</strong> Uses 3-digit hexadecimal values in Red-Green-Blue order.
+                            <br>Format: Each digit represents 4-bit values (0-F) converted to 3-bit Genesis values (0-7)
+                            <br>Example: 000 = black, EEE = white, A6E = light blue, E00 = red
+                        </div>
+                    </div>
+                </div>
+
+                <button id="convert-btn" class="convert-btn">Convert to TPL</button>
+                
+                <div class="help-text">
+                    <p>💡 <strong>How to use:</strong></p>
+                    <ul>
+                        <li>Enter your palette data in either format above</li>
+                        <li>Use the conversion buttons to switch between formats</li>
+                        <li>Click "Convert to TPL" to generate the file</li>
+                        <li>The TPL content preview will appear below</li>
+                        <li>Click "Download TPL File" to save the binary TPL file</li>
+                        <li>Check the browser console (F12) for detailed conversion info</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="output-section" id="output-section" style="display: none;">
+                <h2>Output</h2>
+                <div class="tlp-preview">
+                    <h3>TPL File Preview (Text Format):</h3>
+                    <p class="format-note">Note: The actual downloaded file will be in binary TPL format for Tile Layer Pro</p>
+                    <pre id="tlp-content"></pre>
+                </div>
+                
+                <div class="download-section">
+                    <button id="download-btn" class="download-btn">Download TPL File</button>
+                    <span class="filename-info">File will be saved as: <code id="filename">palette.tpl</code></span>
+                </div>
+
+                <div class="palette-comparison">
+                    <h3>Palette Comparison</h3>
+                    <div class="comparison-grid">
+                        <div class="original-palette">
+                            <h4>Original</h4>
+                            <div id="original-colors"></div>
+                        </div>
+                        <div class="converted-palette">
+                            <h4>Converted</h4>
+                            <div id="converted-colors"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Genesis Palette Converter - Made for Ghouls 'n Ghosts, may work for other Sega Genesis games</p>
+            <p>Made by <a href="https://github.com/GoodLuckTrying" target="_blank" style="color: white; text-decoration: underline;">GoodLuckTrying/Wolfric</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

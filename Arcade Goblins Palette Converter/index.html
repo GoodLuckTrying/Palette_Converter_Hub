@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Palette Converter</title>
+    <link rel="icon" type="image/png" href="../Icons/MAME.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="text-align: left; margin-bottom: 10px;">
+                <a href="../index.html" style="color: white; text-decoration: none; font-size: 0.9rem; opacity: 0.9;">← Return to Hub</a>
+            </div>
+            <h1 style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                <img src="../Icons/MAME.png" alt="MAME" style="width: 48px; height: 48px; object-fit: contain;">
+                Arcade Palette Converter
+            </h1>
+            <p>Convert arcade palette data to RGB hex format (Ghosts 'n Goblins style)</p>
+        </header>
+
+        <div class="upload-section">
+            <h2>📁 Upload Existing TPL File</h2>
+            <div class="upload-controls">
+                <input type="file" id="tpl-upload" accept=".tpl" />
+                <button id="upload-btn" class="convert-btn">Load TPL File</button>
+            </div>
+            <div class="upload-info">
+                <p>Upload a TPL file to automatically populate both RGB and Arcade input fields with the extracted palette data.</p>
+            </div>
+        </div>
+
+        <main>
+            <div class="input-section">
+                <h2>Palette Input</h2>
+                <div class="format-tabs">
+                    <button class="tab-btn active" data-format="rgb">RGB Hex Colors</button>
+                    <button class="tab-btn" data-format="arcade">Arcade Goblins Format</button>
+                </div>
+                
+                <div class="input-container">
+                    <div id="rgb-input" class="input-area active">
+                        <label for="rgb-palette">Enter 16 RGB hex colors (one per line OR space-separated):</label>
+                        <textarea id="rgb-palette" placeholder="006600&#10;000000&#10;ccaa00&#10;aa8800&#10;775500&#10;554400&#10;888800&#10;666600&#10;444400&#10;999900&#10;884400&#10;660000&#10;aaaa00&#10;cc0000&#10;cc7700&#10;000000"></textarea>
+                        <div class="palette-preview" id="rgb-preview"></div>
+                        <div class="conversion-controls">
+                            <button id="rgb-to-arcade-btn" class="convert-btn secondary">Convert to Arcade Goblins Format</button>
+                        </div>
+                    </div>
+
+                    <div id="arcade-input" class="input-area">
+                        <label for="arcade-palette-rg">Enter RG palette data (R and G combined, space-separated hex bytes):</label>
+                        <textarea id="arcade-palette-rg" placeholder="06 00 CA A8 75 54 88 66 44 99 84 60 AA C0 C7 00"></textarea>
+                        <label for="arcade-palette-b" style="margin-top: 15px;">Enter B palette data (B values, space-separated hex bytes):</label>
+                        <textarea id="arcade-palette-b" placeholder="B0 00 80 60 00 00 A0 80 60 00 00 00 C0 00 00 00"></textarea>
+                        <div class="palette-preview" id="arcade-preview"></div>
+                        <div class="format-info">
+                            <p><strong>Format:</strong> Ghosts 'n Goblins stores colors in two strings. First string has R and G combined (each byte = [R_first_digit][G_first_digit]). Second string has B values (only the first digit of each byte is used).</p>
+                        </div>
+                        <div class="conversion-controls">
+                            <button id="arcade-to-rgb-btn" class="convert-btn secondary">Convert to RGB Hex</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="convert-btn" class="convert-btn">Convert to TPL</button>
+                
+                <div class="help-text">
+                    <p>💡 <strong>How to use:</strong></p>
+                    <ul>
+                        <li><strong>RGB → Arcade:</strong> Enter RGB hex colors and click "Convert to Arcade Goblins Format"</li>
+                        <li><strong>Arcade → RGB:</strong> Enter arcade palette data and click "Convert to RGB Hex"</li>
+                        <li>Use the tabs to switch between input formats</li>
+                        <li>Click "Convert to TPL" to generate a Tile Layer Pro palette file</li>
+                        <li>Click "Download TPL File" to save the binary TPL file</li>
+                        <li>Upload a TPL file to automatically extract palette data</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="output-section" id="output-section" style="display: none;">
+                <h2>Output</h2>
+                <div class="tlp-preview">
+                    <h3>TPL File Preview (Text Format):</h3>
+                    <p class="format-note">Note: The actual downloaded file will be in binary TPL format for Tile Layer Pro</p>
+                    <pre id="tlp-content"></pre>
+                </div>
+                
+                <div class="download-section">
+                    <button id="download-btn" class="download-btn">Download TPL File</button>
+                    <span class="filename-info">File will be saved as: <code id="filename">palette.tpl</code></span>
+                </div>
+
+                <div class="palette-comparison">
+                    <h3>Palette Preview</h3>
+                    <div class="comparison-grid">
+                        <div class="original-palette">
+                            <h4>Arcade Goblins Format</h4>
+                            <div id="original-colors"></div>
+                        </div>
+                        <div class="converted-palette">
+                            <h4>RGB Hex</h4>
+                            <div id="converted-colors"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="info-section">
+            <h2>🎮 Ghosts 'n Goblins Palette Format</h2>
+            <div class="info-content">
+                <p><strong>Palette Format:</strong></p>
+                <p>Ghosts 'n Goblins uses a single-byte palette format where each color is represented by one byte (two hex digits). The palette consists of 16 colors.</p>
+                
+                <div class="palette-examples">
+                    <div class="palette-example">
+                        <h3>📁 Arcade Goblins Format - RG String (R and G combined)</h3>
+                        <code>06 00 CA A8 75 54 88 66 44 99 84 60 AA C0 C7 00</code>
+                        <p>Each byte contains [R_first_digit][G_first_digit]</p>
+                    </div>
+                    
+                    <div class="palette-example">
+                        <h3>📁 Arcade Goblins Format - B String (B values)</h3>
+                        <code>B0 00 80 60 00 00 A0 80 60 00 00 00 C0 00 00 00</code>
+                        <p>Only the first digit of each byte is used for the B component.</p>
+                    </div>
+                    
+                    <div class="palette-example">
+                        <h3>🎨 RGB Equivalent</h3>
+                        <code>0066bb 000000 ccaa88 aa8866 775500 554400 8888aa 666688 444466 999900 884400 660000 aaaacc cc0000 cc7700 000000</code>
+                        <p>This is the RGB hex representation. Each color combines one byte from the RG string and the first digit from the B string.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Arcade Palette Converter - For Ghosts 'n Goblins and similar arcade games</p>
+            <p>Made by <a href="https://github.com/GoodLuckTrying" target="_blank" style="color: white; text-decoration: underline;">GoodLuckTrying/Wolfric</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Palette Converter</title>
+    <link rel="icon" type="image/png" href="../Icons/FBNeo_-_Arcade_Games.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="text-align: left; margin-bottom: 10px;">
+                <a href="../index.html" style="color: white; text-decoration: none; font-size: 0.9rem; opacity: 0.9;">← Return to Hub</a>
+            </div>
+            <h1 style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                <img src="../Icons/FBNeo_-_Arcade_Games.png" alt="FBNeo" style="width: 48px; height: 48px; object-fit: contain;">
+                Arcade Palette Converter
+            </h1>
+            <p>Convert arcade palette data to RGB hex format (Ghosts 'n Ghouls style)</p>
+        </header>
+
+        <div class="upload-section">
+            <h2>📁 Upload Existing TPL File</h2>
+            <div class="upload-controls">
+                <input type="file" id="tpl-upload" accept=".tpl" />
+                <button id="upload-btn" class="convert-btn">Load TPL File</button>
+            </div>
+            <div class="upload-info">
+                <p>Upload a TPL file to automatically populate both RGB and Arcade input fields with the extracted palette data.</p>
+            </div>
+        </div>
+
+        <main>
+            <div class="input-section">
+                <h2>Palette Input</h2>
+                <div class="format-tabs">
+                    <button class="tab-btn active" data-format="rgb">RGB Hex Colors</button>
+                    <button class="tab-btn" data-format="arcade">Arcade Format</button>
+                </div>
+                
+                <div class="input-container">
+                    <div id="rgb-input" class="input-area active">
+                        <label for="rgb-palette">Enter 16 RGB hex colors (one per line OR space-separated):</label>
+                        <textarea id="rgb-palette" placeholder="0066bb&#10;eeccaa&#10;bb9977&#10;886600&#10;775500&#10;99aacc&#10;7788aa&#10;556688&#10;aaaa77&#10;cccc99&#10;ffffff&#10;aabbdd&#10;cc6600&#10;880000&#10;000000&#10;0066bb"></textarea>
+                        <div class="palette-preview" id="rgb-preview"></div>
+                        <div class="conversion-controls">
+                            <button id="rgb-to-arcade-btn" class="convert-btn secondary">Convert to Arcade Format</button>
+                            <button id="rearrange-btn" class="convert-btn secondary">Rearrange Colors</button>
+                        </div>
+                    </div>
+
+                    <div id="arcade-input" class="input-area">
+                        <label for="arcade-palette">Enter arcade palette data (Fr gb format, space-separated hex bytes):</label>
+                        <textarea id="arcade-palette" placeholder="F1 11 F0 6B FE CA FB 97 F8 60 F7 50 F9 AC F7 8A F5 68 FA A7 FC C9 FF FF FA BD FC 60 F8 00 F1 11"></textarea>
+                        <div class="palette-preview" id="arcade-preview"></div>
+                        <div class="format-info">
+                            <p><strong>Format:</strong> Each color is two bytes in "Fr gb" format. F = flags, r = red, g = green, b = blue. Each color component is a single hex digit from 0 to F.</p>
+                        </div>
+                        <div class="conversion-controls">
+                            <button id="arcade-to-rgb-btn" class="convert-btn secondary">Convert to RGB Hex</button>
+                            <button id="rearrange-btn-arcade" class="convert-btn secondary">Rearrange Colors</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="convert-btn" class="convert-btn">Convert to TPL</button>
+                
+                <div class="help-text">
+                    <p>💡 <strong>How to use:</strong></p>
+                    <ul>
+                        <li><strong>RGB → Arcade:</strong> Enter RGB hex colors and click "Convert to Arcade Format"</li>
+                        <li><strong>Arcade → RGB:</strong> Enter arcade palette data and click "Convert to RGB Hex"</li>
+                        <li>Use the tabs to switch between input formats</li>
+                        <li>Click "Convert to TPL" to generate a Tile Layer Pro palette file</li>
+                        <li>Click "Download TPL File" to save the binary TPL file</li>
+                        <li>Upload a TPL file to automatically extract palette data</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="output-section" id="output-section" style="display: none;">
+                <h2>Output</h2>
+                <div class="tlp-preview">
+                    <h3>TPL File Preview (Text Format):</h3>
+                    <p class="format-note">Note: The actual downloaded file will be in binary TPL format for Tile Layer Pro</p>
+                    <pre id="tlp-content"></pre>
+                </div>
+                
+                <div class="download-section">
+                    <button id="download-btn" class="download-btn">Download TPL File</button>
+                    <span class="filename-info">File will be saved as: <code id="filename">palette.tpl</code></span>
+                </div>
+
+                <div class="palette-comparison">
+                    <h3>Palette Preview</h3>
+                    <div class="comparison-grid">
+                        <div class="original-palette">
+                            <h4>Arcade Format</h4>
+                            <div id="original-colors"></div>
+                        </div>
+                        <div class="converted-palette">
+                            <h4>RGB Hex</h4>
+                            <div id="converted-colors"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="info-section">
+            <h2>🎮 Ghosts 'n Ghouls Color Rearrangement</h2>
+            <div class="info-content">
+                <p><strong>Why rearrange colors?</strong></p>
+                <p>Ghosts 'n Ghouls stores Arthur's full palette in hex format in one specific order, but the sprites read them in a different order. So they need to be rearranged to visualize how sprites truly use it in-game. The original order is the one stored in hex, but the rearranged order is how Tile Molester and the sprites in-game apply it.</p>
+                
+                <div class="palette-examples">
+                    <div class="palette-example">
+                        <h3>📁 Stored in Hex (Original Order)</h3>
+                        <code>F1 11 F0 6B FE CA FB 97 F8 60 F7 50 F9 AC F7 8A F5 68 FA A7 FC C9 FF FF FA BD FC 60 F8 00 F1 11</code>
+                        <p>This is how the palette is stored in the game's ROM files (hex format).</p>
+                    </div>
+                    
+                    <div class="palette-example">
+                        <h3>🎨 How Sprites Use It (In-Game Order)</h3>
+                        <code>F1 11 F0 6B F8 60 F7 50 FE CA FB 97 F9 AC F7 8A F5 68 FA A7 FA BD FC 60 FC C9 FF FF F8 00 F1 11</code>
+                        <p>This is how the sprites actually read and apply the palette in-game.</p>
+                    </div>
+                </div>
+                
+                <div class="rearrangement-details">
+                    <p><strong>Rearrangement Pattern:</strong></p>
+                    <ul>
+                        <li>Swaps colors 3-4 with colors 5-6</li>
+                        <li>Swaps colors 11-12 with colors 13-14</li>
+                    </ul>
+                    <p>Use the "Rearrange Colors" button above to automatically apply this transformation to visualize how sprites truly use the palette in-game.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Arcade Palette Converter - For Ghosts 'n Ghouls and similar arcade games</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
